@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=42", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["portfolioAnalysis"]
+
+[project]
+name = "portfolioAnalysis"
+dynamic = [
+    "version"
+]
+authors = [
+  { name="Jakob Gamper", email="97gamjak@gmail.com" },
+]
+description = "portfolioAnalysis is a python package to track and analysze the performance of all of your asset classes in one place"
+requires-python = ">=3.10"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "pyqt6",
+]
+
+[project.optional-dependencies]
+test = [
+]
+docs = [
+]
+
+[tool.setuptools_scm]
+version_file = "portfolioAnalysis/_version.py"
+
+[project.scripts]
+
+[project.urls]
+
