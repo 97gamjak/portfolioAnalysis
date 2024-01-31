@@ -14,17 +14,20 @@
    <layout class="QVBoxLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
-      <widget class="QWidget" name="tab">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="overview">
        <attribute name="title">
         <string>Overview</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="positions">
        <attribute name="title">
         <string>Positions</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="analytics">
        <attribute name="title">
         <string>Analytics</string>
        </attribute>
