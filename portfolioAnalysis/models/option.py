@@ -1,14 +1,13 @@
 import datetime as dt
 
-from dataclasses import dataclass
+from typing import Optional
+from sqlmodel import SQLModel, Field
 
 
-@dataclass
-class Option:
+class Option(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
     ticker: str
-    strike: float
-    expiration: str
-    price: float
-
-    def __post_init__(self):
-        print(self.ticker, self.strike, self.expiration, self.price)
+    premium: float
+    strike_price: float
+    expiration_date: dt.datetime
+    underlying_price: Optional[float] = None
