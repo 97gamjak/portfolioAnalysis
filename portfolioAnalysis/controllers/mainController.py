@@ -8,6 +8,6 @@ class MainController(QObject):
     def __init__(self, sql_engine, main_repository):
         super().__init__()
 
-        self.main_service = MainService(sql_engine, main_repository)
+        self.main_service = MainService(main_repository)
         self.option_controller = OptionController(
             self.main_service.option_service)

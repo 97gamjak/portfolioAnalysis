@@ -15,11 +15,14 @@ from PyQt6.QtWidgets import (
     QLayout,
     QErrorMessage,
     QMessageBox,
+    QTableView,
+    QTableWidget,
 )
 from PyQt6.QtGui import QDoubleValidator
 from PyQt6.uic import loadUi
 
 from __init__ import __resources_path__
+from enums.optionType import OptionType
 
 
 class MainView(QMainWindow):
@@ -40,13 +43,18 @@ class OptionsTab(QDialog):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.repository = parent.repository
+        self.repository = parent.repository.option_repository
         self.controller = parent.controller.option_controller
         self.parent = parent
 
         self.options = QWidget()
         self.options.setObjectName(u"options")
         self.parent._ui.tabWidget.addTab(self, "Options")
+
+        self._optionTableView = QTableView(self)
+        self._optionTableView.setObjectName(u"optionTableView")
+        self._optionTableView.setGeometry(QRect(0, 0, 800, 600))
+        self._optionTableView.setModel(self.repository)
 
         self._addButton = AddButton(self)
         self._addButton.clicked.connect(self.show_add_dialog)
@@ -130,10 +138,9 @@ class AddButtonDialog(QDialog):
 class AddOptionView:
     def __init__(self):
         self.option_type_widget = QComboBox()
-        self.option_type_widget.addItem("Put Sell")
-        self.option_type_widget.addItem("Call Sell")
-        self.option_type_widget.addItem("Put Buy")
-        self.option_type_widget.addItem("Call Buy")
+
+        for value in OptionType.values():
+            self.option_type_widget.addItem(value)
 
         self.ticker_widget = QLineEdit()
         self.ticker_widget.setPlaceholderText("Ticker")
@@ -161,6 +168,10 @@ class AddOptionView:
         self.expiration_layout = QHBoxLayout()
         self.expiration_layout.addWidget(self.expiration_label)
         self.expiration_layout.addWidget(self.expiration_widget)
+
+    @property
+    def option_type(self):
+        return self.option_type_widget.currentText()
 
     @property
     def ticker(self):
