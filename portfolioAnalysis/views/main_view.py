@@ -12,35 +12,37 @@ from PyQt6.QtWidgets import (
     QComboBox,
     QDateEdit,
     QHBoxLayout,
+    QLayout,
+    QErrorMessage,
 )
 from PyQt6.QtGui import QDoubleValidator
 from PyQt6.uic import loadUi
 
 from __init__ import __resources_path__
 
-from controllers.main_controller import MainController, OptionsTabController
-import resources.resources
-
 
 class MainView(QMainWindow):
-    def __init__(self, model, main_controller):
+    def __init__(self, repository, controller):
         super().__init__()
 
+        self.repository = repository
+        self.controller = controller
+
         self._ui = loadUi(__resources_path__ / "main_view.ui", self)
-        self._model = model
-        self._main_controller = main_controller
-        self._options_tab = OptionsTab(self, model)
+        self._options_tab = OptionsTab(self)
 
     def resizeEvent(self, event):
         self._options_tab.resizeEvent(event)
 
 
 class OptionsTab(QDialog):
-    def __init__(self, parent, main_model):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.controller = OptionsTabController(main_model)
 
+        self.repository = parent.repository
+        self.controller = parent.controller.option_controller
         self.parent = parent
+
         self.options = QWidget()
         self.options.setObjectName(u"options")
         self.parent._ui.tabWidget.addTab(self, "Options")
@@ -87,79 +89,83 @@ class AddButtonDialog(QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.option_type = QComboBox()
-        self.option_type.addItem("Put Sell")
-        self.option_type.addItem("Call Sell")
-        self.option_type.addItem("Put Buy")
-        self.option_type.addItem("Call Buy")
+        self.add_option_view = AddOptionView()
 
-        self.ticker = QLineEdit()
-        self.ticker.setPlaceholderText("Ticker")
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.add_option_view.option_type_widget)
+        self.layout.addWidget(self.add_option_view.ticker_widget)
+        self.layout.addWidget(self.add_option_view.premium_widget)
+        self.layout.addWidget(self.add_option_view.strike_widget)
+        self.layout.addWidget(self.add_option_view.underlying_price_widget)
+        self.layout.addLayout(self.add_option_view.expiration_layout)
+        self.layout.addWidget(self.add_option_view.expiration_widget)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
 
-        self.underlying = QLineEdit()
-        self.underlying.setPlaceholderText("Underlying")
+        self.buttonBox.accepted.connect(self.add_option)
+        self.controller.add_option_successful.connect(self.save_error)
 
-        self.strike = QLineEdit()
-        self.strike.setPlaceholderText("Strike")
-        self.strike.setValidator(QDoubleValidator())
+    def add_option(self):
+        self.controller.add_option(self.add_option_view)
+        self.connectNotify
 
-        self.expiration = QDateEdit()
-        self.expiration.setCalendarPopup(True)
-        self.expiration.setDisplayFormat("dd-MM-yyyy")
-        self.expiration.setDate(QDate.currentDate())
+    def save_error(self):
+        self.error_box = QErrorMessage()
+        self.error_box.showMessage("Error adding option")
+        self.error_box.exec()
+
+
+class AddOptionView:
+    def __init__(self):
+        self.option_type_widget = QComboBox()
+        self.option_type_widget.addItem("Put Sell")
+        self.option_type_widget.addItem("Call Sell")
+        self.option_type_widget.addItem("Put Buy")
+        self.option_type_widget.addItem("Call Buy")
+
+        self.ticker_widget = QLineEdit()
+        self.ticker_widget.setPlaceholderText("Ticker")
+
+        self.premium_widget = QLineEdit()
+        self.premium_widget.setPlaceholderText("Premium")
+        self.premium_widget.setValidator(QDoubleValidator())
+
+        self.strike_widget = QLineEdit()
+        self.strike_widget.setPlaceholderText("Strike Price")
+        self.strike_widget.setValidator(QDoubleValidator())
+
+        self.underlying_price_widget = QLineEdit()
+        self.underlying_price_widget.setPlaceholderText("Underlying Price")
+        self.underlying_price_widget.setValidator(QDoubleValidator())
+
+        self.expiration_widget = QDateEdit()
+        self.expiration_widget.setCalendarPopup(True)
+        self.expiration_widget.setDisplayFormat("dd-MM-yyyy")
+        self.expiration_widget.setDate(QDate.currentDate())
         self.expiration_label = QLabel("Expiration Date:")
         self.expiration_label.setFixedHeight(10)
         self.expiration_label.setMaximumHeight(10)
 
         self.expiration_layout = QHBoxLayout()
         self.expiration_layout.addWidget(self.expiration_label)
-        self.expiration_layout.addWidget(self.expiration)
+        self.expiration_layout.addWidget(self.expiration_widget)
 
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.option_type)
-        self.layout.addWidget(self.ticker)
-        self.layout.addWidget(self.underlying)
-        self.layout.addWidget(self.strike)
-        self.layout.addLayout(self.expiration_layout)
-        self.layout.addWidget(self.expiration)
-        self.layout.addWidget(self.buttonBox)
-        self.setLayout(self.layout)
+    @property
+    def ticker(self):
+        return self.ticker_widget.text()
 
-        self.buttonBox.accepted.connect(
-            lambda: self.controller.show_add_dialog(self.ticker.text()))
+    @property
+    def premium(self):
+        return self.premium_widget.text()
 
-    def accept(self):
-        signal = {
-            "ticker": self.ticker.text(),
-            "strike": float(self.strike.text()),
-            "expiration": self.expiration.text(),
-            "price": 0.0,
-        }
+    @property
+    def strike(self):
+        return self.strike_widget.text()
 
-        self.controller.show_add_dialog(signal)
+    @property
+    def underlying_price(self):
+        return self.underlying_price_widget.text()
 
-    # # connect widgets to controller
-    # self._ui.spinBox_amount.valueChanged.connect(
-    #     self._main_controller.change_amount)
-    # self._ui.pushButton_reset.clicked.connect(
-    #     lambda: self._main_controller.change_amount(0))
-
-    # listen for model event signals
-    # self._model.amount_changed.connect(self.on_amount_changed)
-    # self._model.even_odd_changed.connect(self.on_even_odd_changed)
-    # self._model.enable_reset_changed.connect(self.on_enable_reset_changed)
-
-    # # set a default value
-    # self._main_controller.change_amount(42)
-
-    # @pyqtSlot(int)
-    # def on_amount_changed(self, value):
-    #     self._ui.spinBox_amount.setValue(value)
-
-    # @pyqtSlot(str)
-    # def on_even_odd_changed(self, value):
-    #     self._ui.label_even_odd.setText(value)
-
-    # @pyqtSlot(bool)
-    # def on_enable_reset_changed(self, value):
-    #     self._ui.pushButton_reset.setEnabled(value)
+    @property
+    def expiration(self):
+        return self.expiration_widget.date()

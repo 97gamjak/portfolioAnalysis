@@ -1,5 +1,0 @@
-pyqt6
-
-[docs]
-
-[test]

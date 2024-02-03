@@ -1,17 +1,20 @@
 from PyQt6.QtCore import QAbstractListModel, Qt
 from sqlmodel import Session, select
 
-from portfolioAnalysis.models.option import Option
+from models.option import Option
 
 
 class OptionRepository(QAbstractListModel):
     def __init__(self, sql_engine, parent=None):
         super().__init__(parent)
         self.sql_engine = sql_engine
-        self.options = self.get_options()
+        self.refresh()
 
     def rowCount(self, parent):
         return len(self.options)
+
+    def refresh(self):
+        self.options = self.get_options()
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
@@ -20,5 +23,8 @@ class OptionRepository(QAbstractListModel):
 
     def get_options(self):
         with Session(self.sql_engine) as session:
-            statement = select(Option)
-            return session.exec(statement).all()
+            try:
+                statement = select(Option)
+                return session.exec(statement).all()
+            except Exception:
+                return []
