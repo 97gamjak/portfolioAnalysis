@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLayout,
     QErrorMessage,
+    QMessageBox,
 )
 from PyQt6.QtGui import QDoubleValidator
 from PyQt6.uic import loadUi
@@ -102,17 +103,28 @@ class AddButtonDialog(QDialog):
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
+        self._want_to_close = False
+
         self.buttonBox.accepted.connect(self.add_option)
-        self.controller.add_option_successful.connect(self.save_error)
+        self.controller.add_option_successful.connect(
+            self.add_option_successful)
+
+    def accept(self):
+        if self._want_to_close:
+            super().accept()
 
     def add_option(self):
+        self._want_to_close = False
         self.controller.add_option(self.add_option_view)
-        self.connectNotify
 
-    def save_error(self):
-        self.error_box = QErrorMessage()
-        self.error_box.showMessage("Error adding option")
-        self.error_box.exec()
+    def add_option_successful(self, success):
+        if success:
+            self._want_to_close = True
+            self.accept()
+        else:
+            self._want_to_close = False
+            self.error_box = QMessageBox()
+            self.error_box.warning(self, "Error", "Error saving option")
 
 
 class AddOptionView:
