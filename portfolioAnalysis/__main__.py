@@ -2,15 +2,11 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from controllers.mainController import MainController
-from repositories.mainRepository import MainRepository
-from views.main_view import MainView
+from controllers import MainController
+from repositories import MainRepository
+from views import MainView
 
 from db import init_db
-from models.asset import Asset
-from models.option import Option
-
-from __init__ import __resources_path__
 
 
 class App(QApplication):
