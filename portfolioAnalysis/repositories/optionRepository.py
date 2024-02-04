@@ -90,3 +90,7 @@ class OptionRepository(QAbstractTableModel):
             option = self.options[index]
             statement = select(Option).where(Option.id == option.id)
             return session.exec(statement).first()
+
+    @property
+    def expiration_date_column(self):
+        return self.headers.index("Expiration Date")
