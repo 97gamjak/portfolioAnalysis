@@ -5,8 +5,10 @@ from enums.assetType import AssetType
 
 
 class Asset(SQLModel, table=True):
-    test: int = Field(primary_key=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    test: int  # = Field(primary_key=True)
     ticker: str
+    price: float = 1.0
 
     # sql_asset_type: str = Field(default=str(AssetType.STOCK))
 

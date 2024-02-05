@@ -14,8 +14,8 @@ class Option(SQLModel, table=True):
 
     # underlying_price: Optional[float] = None
 
-    underlying_ticker: str = Field(
-        default=None, foreign_key="asset.ticker")
+    # underlying_ticker: str = Field(
+    #     default=None, foreign_key="asset.ticker")
 
     @property
     def ticker(self):

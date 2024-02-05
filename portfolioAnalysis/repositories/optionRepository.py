@@ -3,14 +3,14 @@ from sqlmodel import Session, select
 from datetime import datetime as dt
 
 from models.option import Option
+from db import sql_engine
 
 
 class OptionRepository(QAbstractTableModel):
     headers = ["Ticker", "Premium"]
 
-    def __init__(self, sql_engine, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.sql_engine = sql_engine
         self.refresh()
 
     def rowCount(self, parent):
@@ -37,13 +37,13 @@ class OptionRepository(QAbstractTableModel):
         self.table = self.get_table_data()
 
     def add_option(self, option):
-        with Session(self.sql_engine) as session:
+        with Session(sql_engine) as session:
             session.add(option)
             session.commit()
             self.refresh()
 
     def get_options(self):
-        with Session(self.sql_engine) as session:
+        with Session(sql_engine) as session:
             try:
                 statement = select(Option)
                 return session.exec(statement).all()

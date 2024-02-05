@@ -2,12 +2,12 @@ from PyQt6.QtCore import QAbstractTableModel, Qt
 from sqlmodel import Session, select
 
 from models.asset import Asset
+from db import sql_engine
 
 
 class AssetRepository(QAbstractTableModel):
-    def __init__(self, sql_engine, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.sql_engine = sql_engine
         self.refresh()
 
     def rowCount(self, parent):
@@ -34,13 +34,13 @@ class AssetRepository(QAbstractTableModel):
         self.table = self.get_table_data()
 
     def add_asset(self, asset):
-        with Session(self.sql_engine) as session:
+        with Session(sql_engine) as session:
             session.add(asset)
             session.commit()
             self.refresh()
 
     def get_assets(self):
-        with Session(self.sql_engine) as session:
+        with Session(sql_engine) as session:
             try:
                 statement = select(Asset)
                 return session.exec(statement).all()
@@ -56,15 +56,14 @@ class AssetRepository(QAbstractTableModel):
         return table
 
     def find_asset_by_ticker(self, ticker):
-        with Session(self.sql_engine) as session:
+        with Session(sql_engine) as session:
             try:
                 statement = select(Asset).where(Asset.ticker == ticker)
                 return session.exec(statement).first()
             except Exception:
                 return None
 
-    def create_or_add_asset(self, ticker):
-        asset = Asset(ticker=ticker)
+    def create_or_add_asset(self, asset):
         if self.find_asset_by_ticker(asset.ticker) is None:
             self.add_asset(asset)
         return asset
