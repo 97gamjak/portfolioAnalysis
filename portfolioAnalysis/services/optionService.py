@@ -11,4 +11,4 @@ class OptionService:
         asset = Asset(ticker="test", test=1)
 
         self.asset_repository.create_or_add_asset(asset)
-        # self.option_repository.add_option(option)
+        self.option_repository.add_option(option)

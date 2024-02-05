@@ -12,10 +12,10 @@ class Option(SQLModel, table=True):
     expiration_date: dt.datetime = Field(primary_key=True)
     premium: float
 
-    # underlying_price: Optional[float] = None
+    underlying_price: Optional[float] = None
 
-    # underlying_ticker: str = Field(
-    #     default=None, foreign_key="asset.ticker")
+    underlying_ticker: str = Field(
+        default=None, foreign_key="asset.ticker")
 
     @property
     def ticker(self):
