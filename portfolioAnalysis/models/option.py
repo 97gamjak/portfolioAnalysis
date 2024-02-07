@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime as dt
 
 from typing import Optional
@@ -7,15 +9,17 @@ from enums.optionType import OptionType
 
 
 class Option(SQLModel, table=True):
-    option_type: OptionType = Field(primary_key=True)
-    strike_price: float = Field(primary_key=True)
-    expiration_date: dt.datetime = Field(primary_key=True)
+    id: Optional[int] = Field(primary_key=True, index=True)
+    option_type: OptionType
+    strike_price: float
     premium: float
+
+    execution_date: dt.date
+    expiration_date: dt.date
 
     underlying_price: Optional[float] = None
 
-    underlying_ticker: str = Field(
-        default=None, foreign_key="asset.ticker")
+    underlying_ticker: str = Field(default=None, foreign_key="asset.ticker")
 
     @property
     def ticker(self):
@@ -30,3 +34,12 @@ class Option(SQLModel, table=True):
 
     def _transform_strike_price(self):
         return f"{self.strike_price:.3f}".replace(".", "").zfill(8)
+
+    def edit(self, option: Option):
+        self.option_type = option.option_type
+        self.strike_price = option.strike_price
+        self.expiration_date = option.expiration_date
+        self.premium = option.premium
+        self.underlying_price = option.underlying_price
+        self.underlying_ticker = option.underlying_ticker
+        return self

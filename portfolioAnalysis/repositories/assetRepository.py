@@ -63,7 +63,7 @@ class AssetRepository(QAbstractTableModel):
             except Exception:
                 return None
 
-    def create_or_add_asset(self, asset):
+    def create_asset_if_not_found(self, asset):
         if self.find_asset_by_ticker(asset.ticker) is None:
             self.add_asset(asset)
         return asset

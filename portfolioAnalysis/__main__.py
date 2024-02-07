@@ -21,7 +21,7 @@ class App(QApplication):
         self.repository = MainRepository()
         self.controller = MainController(self.repository)
         self.view = MainView(self.repository, self.controller)
-        self.view.show()
+        self.view.showMaximized()
 
 
 if __name__ == '__main__':

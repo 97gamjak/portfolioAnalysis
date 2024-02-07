@@ -17,6 +17,12 @@ class OptionController(QObject):
         super().__init__()
         self.service = service
 
+    def delete_option(self, index):
+        self.service.delete_option(index)
+
+    def get_option(self, index):
+        return self.service.get_option(index)
+
     def add_option(self, option_view):
         try:
             option = self.translate_option_view(option_view)
@@ -26,19 +32,38 @@ class OptionController(QObject):
         except Exception as e:
             self.add_option_successful.emit(False, str(e))
 
+    def edit_option(self, option_view, index):
+        try:
+            option = self.translate_option_view(option_view)
+
+            self.service.edit_option(option, index)
+            self.add_option_successful.emit(True, "OK")
+        except Exception as e:
+            self.add_option_successful.emit(False, str(e))
+
     def translate_option_view(self, option_view):
         underlying_ticker = option_view.ticker
 
         validate_not_empty(option_view.strike, "Strike")
         validate_not_empty(option_view.premium, "Premium")
-
-        option_type = OptionType(option_view.option_type)
         strike = float(option_view.strike)
-        expiration = option_view.expiration.toPyDate()
         premium = float(option_view.premium)
 
-        option = Option(option_type=option_type, underlying_ticker=underlying_ticker, strike_price=strike,
-                        expiration_date=expiration, premium=premium)
+        option_type = OptionType(option_view.option_type)
+        expiration = option_view.expiration.toPyDate()
+        execution = option_view.execution.toPyDate()
+
+        underlying_price = option_view.underlying_price if option_view.underlying_price else None
+
+        option = Option(
+            option_type=option_type,
+            underlying_ticker=underlying_ticker,
+            strike_price=strike,
+            expiration_date=expiration,
+            execution_date=execution,
+            premium=premium,
+            underlying_price=underlying_price
+        )
 
         return option
 

@@ -10,11 +10,17 @@ from views.options.ambiguousTickerDialog import AmbiguousTickerDialog
 
 
 class AddOptionDialog(QDialog):
-    def __init__(self, controller):
+    def __init__(self, controller, index=None):
         super().__init__()
         self.controller = controller
+        self.index = index
 
-        self.setWindowTitle("HELLO!")
+        if index is None:
+            self.setWindowTitle("Add Option")
+            self.edit_mode = False
+        else:
+            self.setWindowTitle("Edit Option")
+            self.edit_mode = True
 
         button_box = QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel
 
@@ -22,14 +28,24 @@ class AddOptionDialog(QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-        self.add_option_view = AddOptionView()
+        if self.edit_mode:
+            self.add_option_view = AddOptionView(
+                self.controller.get_option(index))
+        else:
+            self.add_option_view = AddOptionView()
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.add_option_view.option_type_widget)
+        self.layout.addWidget(self.add_option_view.ticker_label)
         self.layout.addWidget(self.add_option_view.ticker_widget)
+        self.layout.addWidget(self.add_option_view.premium_label)
         self.layout.addWidget(self.add_option_view.premium_widget)
+        self.layout.addWidget(self.add_option_view.strike_label)
         self.layout.addWidget(self.add_option_view.strike_widget)
+        self.layout.addWidget(self.add_option_view.underlying_price_label)
         self.layout.addWidget(self.add_option_view.underlying_price_widget)
+        self.layout.addLayout(self.add_option_view.execution_layout)
+        self.layout.addWidget(self.add_option_view.execution_widget)
         self.layout.addLayout(self.add_option_view.expiration_layout)
         self.layout.addWidget(self.add_option_view.expiration_widget)
         self.layout.addWidget(self.buttonBox)
@@ -53,8 +69,10 @@ class AddOptionDialog(QDialog):
         self.ticker_is_valid = True
         self.controller.validate_ticker(self.add_option_view.ticker)
 
-        if self.ticker_is_valid:
+        if self.ticker_is_valid and not self.edit_mode:
             self.controller.add_option(self.add_option_view)
+        elif self.ticker_is_valid and self.edit_mode:
+            self.controller.edit_option(self.add_option_view, self.index)
 
     def add_option_successful(self, success, message):
         if success:

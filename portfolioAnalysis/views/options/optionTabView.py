@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
     QWidget,
     QTableView,
     QPushButton,
+    QHeaderView,
 )
 from PyQt6.QtGui import QIcon
 
@@ -34,16 +35,28 @@ class OptionsTabView(QDialog):
         self.optionTableView.setGeometry(QRect(0, 0, 800, 600))
         self.optionTableView.setModel(self.repository)
         self.optionTableView.horizontalHeader().setStretchLastSection(True)
+        self.optionTableView.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.ResizeToContents)
 
         delegate = EditDeleteButtonsDelegate(self.optionTableView)
         self.optionTableView.setItemDelegateForColumn(
             self.repository.columnCount(None)-1, delegate)
+
+        delegate.delete_button_clicked.connect(self.delete_option)
+        delegate.edit_button_clicked.connect(self.edit_option)
 
     def resizeEvent(self, event):
         self.addButton.resizeEvent(event)
 
     def show_add_dialog(self):
         dlg = AddOptionDialog(self.controller)
+        dlg.exec()
+
+    def delete_option(self, index):
+        self.controller.delete_option(index.row())
+
+    def edit_option(self, index):
+        dlg = AddOptionDialog(self.controller, index.row())
         dlg.exec()
 
 

@@ -7,7 +7,8 @@ from db import sql_engine
 
 
 class OptionRepository(QAbstractTableModel):
-    headers = ["Ticker", "Premium", ""]
+    headers = ["Ticker", "Premium", "Strike",
+               "Execution Date", "Expiration Date", ""]
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -18,7 +19,7 @@ class OptionRepository(QAbstractTableModel):
         return len(self.table)
 
     def columnCount(self, parent):
-        return len(self.table[0]) if len(self.table) > 0 else 0
+        return len(self.headers)
 
     def headerData(self, section, orientation, role):
         if role == Qt.ItemDataRole.DisplayRole:
@@ -58,6 +59,34 @@ class OptionRepository(QAbstractTableModel):
         table = []
         for option in self.options:
             table.append(
-                [option.ticker, option.premium, ""])
+                [option.ticker, f"$ {option.premium}", f"$ {option.strike_price}", str(option.execution_date), str(option.expiration_date), ""])
 
         return table
+
+    def delete_option_by_index(self, index):
+        with Session(sql_engine) as session:
+            session.delete(self.options[index])
+            session.commit()
+            self.beginRemoveRows(QModelIndex(), index, index)
+            self.refresh()
+            self.endRemoveRows()
+
+    def get_option_by_index(self, index):
+        return self.options[index]
+
+    def edit_option(self, option, index):
+        with Session(sql_engine) as session:
+            option_to_edit = self.find_option_by_index(index)
+            option_to_edit.edit(option)
+            session.add(option_to_edit)
+            session.commit()
+            session.refresh(option_to_edit)
+            self.refresh()
+            self.dataChanged.emit(self.index(index, 0), self.index(
+                index, self.columnCount(self.parent)))
+
+    def find_option_by_index(self, index):
+        with Session(sql_engine) as session:
+            option = self.options[index]
+            statement = select(Option).where(Option.id == option.id)
+            return session.exec(statement).first()
