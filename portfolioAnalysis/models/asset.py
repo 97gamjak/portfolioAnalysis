@@ -6,5 +6,5 @@ from enums.assetType import AssetType
 
 class Asset(SQLModel, table=True):
     ticker: str = Field(primary_key=True)
-    company_name: str = Field(default=None)
+    company_name: str = ""
     sql_asset_type: AssetType = Field(default=AssetType.STOCK)

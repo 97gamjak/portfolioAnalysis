@@ -1,3 +1,5 @@
+import requests
+
 url = 'https://query2.finance.yahoo.com/v1/finance/search'
 
 headers = {
@@ -14,3 +16,12 @@ def params_init(text: str):
     params["quotesQueryId"] = "tss_match_phrase_query"
 
     return params
+
+
+def get_yf_response_quotes(params):
+    response = requests.get(url, headers=headers, params=params).json()
+
+    if not response["quotes"]:
+        return None
+    else:
+        return response["quotes"]

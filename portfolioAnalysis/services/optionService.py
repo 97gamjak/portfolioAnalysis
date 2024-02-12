@@ -14,7 +14,7 @@ class OptionService:
 
     def add_option(self, option):
 
-        asset = Asset(ticker="test", test=1)
+        asset = Asset(ticker=option.underlying_ticker)
 
         self.asset_repository.create_asset_if_not_found(asset)
         self.option_repository.add_option(option)
@@ -24,3 +24,7 @@ class OptionService:
 
         self.asset_repository.create_asset_if_not_found(asset)
         self.option_repository.edit_option(option, index)
+
+    def get_underlying_by_option(self, option):
+        return self.asset_repository.find_asset_by_ticker(
+            option.underlying_ticker)

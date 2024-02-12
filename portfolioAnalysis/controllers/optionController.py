@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import QLayout
 
 from models.option import Option
 from enums.optionType import OptionType
-from utils.yfinanceUtils import params_init, url, headers
+from utils.yfinanceUtils import params_init, get_yf_response_quotes
 
 
 class OptionController(QObject):
@@ -23,6 +23,9 @@ class OptionController(QObject):
 
     def get_option(self, index):
         return self.service.get_option(index)
+
+    def get_underlying_by_option(self, option):
+        return self.service.get_underlying_by_option(option)
 
     def add_option(self, option_view):
         try:
@@ -68,15 +71,15 @@ class OptionController(QObject):
             return
 
         params = params_init(ticker)
-        response = requests.get(url, headers=headers, params=params).json()
+        response_quotes = get_yf_response_quotes(params)
 
-        if not response["quotes"]:
+        if response_quotes is None:
             self.invalid_ticker.emit()
             return
 
-        if response["quotes"][0]["symbol"] != ticker:
+        if response_quotes[0]["symbol"] != ticker:
             ambiguous_tickers = [quote["symbol"] + " " + quote["shortname"]
-                                 for quote in response["quotes"]]
+                                 for quote in response_quotes]
             self.ambiguous_ticker.emit(ambiguous_tickers)
 
 

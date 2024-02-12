@@ -3,6 +3,7 @@ from sqlmodel import Session, select
 
 from models.asset import Asset
 from db import sql_engine
+from utils.yfinanceUtils import params_init, get_yf_response_quotes
 
 
 class AssetRepository(QAbstractTableModel):
@@ -34,6 +35,9 @@ class AssetRepository(QAbstractTableModel):
         self.table = self.get_table_data()
 
     def add_asset(self, asset):
+        if not asset.company_name:
+            asset.company_name = find_company_name_by_ticker(asset.ticker)
+
         with Session(sql_engine) as session:
             session.add(asset)
             session.commit()
@@ -56,14 +60,23 @@ class AssetRepository(QAbstractTableModel):
         return table
 
     def find_asset_by_ticker(self, ticker):
+        print(ticker)
         with Session(sql_engine) as session:
-            try:
-                statement = select(Asset).where(Asset.ticker == ticker)
-                return session.exec(statement).first()
-            except Exception:
-                return None
+            statement = select(Asset).where(Asset.ticker == ticker)
+            print(self.assets)
+            return session.exec(statement).first()
 
     def create_asset_if_not_found(self, asset):
         if self.find_asset_by_ticker(asset.ticker) is None:
             self.add_asset(asset)
         return asset
+
+
+def find_company_name_by_ticker(ticker: str):
+    params = params_init(ticker)
+    response_quotes = get_yf_response_quotes(params)
+
+    if response_quotes is None:
+        return ""
+    else:
+        return response_quotes[0]["shortname"]
