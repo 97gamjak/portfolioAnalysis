@@ -2,11 +2,10 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from controllers import MainController
-from repositories import MainRepository
-from views import MainView
-
-from db import init_db
+from portfolioAnalysis.controllers import MainController
+from portfolioAnalysis.repositories import MainRepository
+from portfolioAnalysis.views import MainView
+from portfolioAnalysis.db import init_db
 
 
 class App(QApplication):

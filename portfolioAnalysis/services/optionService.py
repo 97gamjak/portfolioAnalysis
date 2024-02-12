@@ -1,4 +1,4 @@
-from models.asset import Asset
+from portfolioAnalysis.models.asset import Asset
 
 
 class OptionService:

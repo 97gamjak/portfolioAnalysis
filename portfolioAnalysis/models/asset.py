@@ -1,7 +1,7 @@
 from sqlmodel import Field, SQLModel
 from typing import Optional
 
-from enums.assetType import AssetType
+from portfolioAnalysis.enums.assetType import AssetType
 
 
 class Asset(SQLModel, table=True):
