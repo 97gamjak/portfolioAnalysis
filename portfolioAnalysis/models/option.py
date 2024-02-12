@@ -14,12 +14,14 @@ class Option(SQLModel, table=True):
     strike_price: float
     premium: float
 
+    shares: int = 1
+
     execution_date: dt.date
     expiration_date: dt.date
 
-    underlying_price: Optional[float] = None
-
     underlying_ticker: str = Field(default=None, foreign_key="asset.ticker")
+    underlying_price: Optional[float] = None
+    underlying_shares: int = 100
 
     @property
     def ticker(self):

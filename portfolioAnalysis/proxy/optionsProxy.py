@@ -9,6 +9,7 @@ class OpenOptionProxy(QSortFilterProxyModel):
         self.parent = parent
         self.setSourceModel(model)
         self.setFilterKeyColumn(model.expiration_date_column)
+        model.dataChanged.connect(self.invalidateFilter)
 
     def filterAcceptsRow(self, source_row, source_parent):
         idx = self.sourceModel().index(

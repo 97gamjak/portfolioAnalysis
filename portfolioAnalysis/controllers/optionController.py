@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import QLayout
 
 from models.option import Option
 from enums.optionType import OptionType
+from utils.yfinanceUtils import params_init, url, headers
 
 
 class OptionController(QObject):
@@ -42,27 +43,21 @@ class OptionController(QObject):
             self.add_option_successful.emit(False, str(e))
 
     def translate_option_view(self, option_view):
-        underlying_ticker = option_view.ticker
-
         validate_not_empty(option_view.strike, "Strike")
         validate_not_empty(option_view.premium, "Premium")
-        strike = float(option_view.strike)
-        premium = float(option_view.premium)
-
-        option_type = OptionType(option_view.option_type)
-        expiration = option_view.expiration.toPyDate()
-        execution = option_view.execution.toPyDate()
-
-        underlying_price = option_view.underlying_price if option_view.underlying_price else None
 
         option = Option(
-            option_type=option_type,
-            underlying_ticker=underlying_ticker,
-            strike_price=strike,
-            expiration_date=expiration,
-            execution_date=execution,
-            premium=premium,
-            underlying_price=underlying_price
+            option_type=OptionType(option_view.option_type),
+            underlying_ticker=option_view.ticker,
+            strike_price=float(option_view.strike),
+            expiration_date=option_view.expiration_date.toPyDate(),
+            execution_date=option_view.execution_date.toPyDate(),
+            premium=float(option_view.premium),
+            shares=int(option_view.shares) if option_view.shares else 1,
+            underlying_price=float(
+                option_view.underlying_price) if option_view.underlying_price else None,
+            underlying_shares=int(
+                option_view.underlying_shares) if option_view.underlying_shares else 100
         )
 
         return option
@@ -79,8 +74,6 @@ class OptionController(QObject):
             self.invalid_ticker.emit()
             return
 
-        print(response["quotes"][0]["symbol"])
-
         if response["quotes"][0]["symbol"] != ticker:
             ambiguous_tickers = [quote["symbol"] + " " + quote["shortname"]
                                  for quote in response["quotes"]]
@@ -90,21 +83,3 @@ class OptionController(QObject):
 def validate_not_empty(value, message):
     if not value:
         raise ValueError(f"{message} can not be empty")
-
-
-url = 'https://query2.finance.yahoo.com/v1/finance/search'
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36',
-}
-
-
-def params_init(text: str):
-    params = {}
-    params["q"] = text
-    params["quotesCount"] = 10
-    params["newsCount"] = 0
-    params["enableFuzzyQuery"] = False
-    params["quotesQueryId"] = "tss_match_phrase_query"
-
-    return params

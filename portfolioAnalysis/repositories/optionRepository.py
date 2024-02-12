@@ -8,7 +8,7 @@ from db import sql_engine
 
 class OptionRepository(QAbstractTableModel):
     headers = ["Ticker", "Premium", "Strike",
-               "Execution Date", "Expiration Date", ""]
+               "Execution Date", "Expiration Date", "Shares", "Underlying Shares", ""]
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -59,7 +59,7 @@ class OptionRepository(QAbstractTableModel):
         table = []
         for option in self.options:
             table.append(
-                [option.ticker, f"$ {option.premium}", f"$ {option.strike_price}", str(option.execution_date), str(option.expiration_date), ""])
+                [option.ticker, f"$ {option.premium}", f"$ {option.strike_price}", str(option.execution_date), str(option.expiration_date), option.shares, option.underlying_shares, ""])
 
         return table
 

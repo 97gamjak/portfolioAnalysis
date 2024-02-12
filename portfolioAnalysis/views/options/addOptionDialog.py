@@ -34,20 +34,7 @@ class AddOptionDialog(QDialog):
         else:
             self.add_option_view = AddOptionView()
 
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.add_option_view.option_type_widget)
-        self.layout.addWidget(self.add_option_view.ticker_label)
-        self.layout.addWidget(self.add_option_view.ticker_widget)
-        self.layout.addWidget(self.add_option_view.premium_label)
-        self.layout.addWidget(self.add_option_view.premium_widget)
-        self.layout.addWidget(self.add_option_view.strike_label)
-        self.layout.addWidget(self.add_option_view.strike_widget)
-        self.layout.addWidget(self.add_option_view.underlying_price_label)
-        self.layout.addWidget(self.add_option_view.underlying_price_widget)
-        self.layout.addLayout(self.add_option_view.execution_layout)
-        self.layout.addWidget(self.add_option_view.execution_widget)
-        self.layout.addLayout(self.add_option_view.expiration_layout)
-        self.layout.addWidget(self.add_option_view.expiration_widget)
+        self.layout = self.add_option_view.layout
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
