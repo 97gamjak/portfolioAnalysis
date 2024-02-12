@@ -42,6 +42,7 @@ class OptionRepository(QAbstractTableModel):
         with Session(sql_engine) as session:
             session.add(option)
             session.commit()
+            session.refresh(option)
             self.beginInsertRows(QModelIndex(), self.rowCount(
                 self.parent), self.rowCount(self.parent))
             self.refresh()
@@ -59,7 +60,15 @@ class OptionRepository(QAbstractTableModel):
         table = []
         for option in self.options:
             table.append(
-                [option.ticker, f"$ {option.premium}", f"$ {option.strike_price}", str(option.execution_date), str(option.expiration_date), option.shares, option.underlying_shares, ""])
+                [option.ticker,
+                 option.premium_currency_string,
+                 option.strike_price_currency_string,
+                 str(option.execution_date),
+                 str(option.expiration_date),
+                 option.shares,
+                 option.underlying_shares,
+                 ""
+                 ])
 
         return table
 

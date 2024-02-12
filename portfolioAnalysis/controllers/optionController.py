@@ -1,11 +1,11 @@
 import yfinance as yf
 import requests
 
-from PyQt6.QtCore import pyqtSlot, pyqtSignal, QObject
-from PyQt6.QtWidgets import QLayout
+from PyQt6.QtCore import pyqtSignal, QObject
 
 from models.option import Option
 from enums.optionType import OptionType
+from enums.currency import Currency
 from utils.yfinanceUtils import params_init, get_yf_response_quotes
 
 
@@ -26,6 +26,9 @@ class OptionController(QObject):
 
     def get_underlying_by_option(self, option):
         return self.service.get_underlying_by_option(option)
+
+    def get_option_premiums_by_option(self, option):
+        return self.service.get_option_premiums_by_option(option)
 
     def add_option(self, option_view):
         try:
@@ -51,6 +54,7 @@ class OptionController(QObject):
 
         option = Option(
             option_type=OptionType(option_view.option_type),
+            currency=Currency(option_view.currency),
             underlying_ticker=option_view.ticker,
             strike_price=float(option_view.strike),
             expiration_date=option_view.expiration_date.toPyDate(),

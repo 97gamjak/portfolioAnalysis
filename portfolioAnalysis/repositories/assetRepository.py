@@ -60,10 +60,8 @@ class AssetRepository(QAbstractTableModel):
         return table
 
     def find_asset_by_ticker(self, ticker):
-        print(ticker)
         with Session(sql_engine) as session:
             statement = select(Asset).where(Asset.ticker == ticker)
-            print(self.assets)
             return session.exec(statement).first()
 
     def create_asset_if_not_found(self, asset):

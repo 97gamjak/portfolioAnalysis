@@ -6,6 +6,7 @@ from typing import Optional
 from sqlmodel import SQLModel, Field
 
 from enums.optionType import OptionType
+from enums.currency import Currency
 
 
 class Option(SQLModel, table=True):
@@ -13,6 +14,7 @@ class Option(SQLModel, table=True):
     option_type: OptionType
     strike_price: float
     premium: float
+    currency: Currency
 
     shares: int = 1
 
@@ -32,7 +34,7 @@ class Option(SQLModel, table=True):
         month = str(self.expiration_date.month).zfill(2)
         year = str(self.expiration_date.year)[2:]
 
-        return day + month + year
+        return year + month + day
 
     def _transform_strike_price(self):
         return f"{self.strike_price:.3f}".replace(".", "").zfill(8)
@@ -45,3 +47,11 @@ class Option(SQLModel, table=True):
         self.underlying_price = option.underlying_price
         self.underlying_ticker = option.underlying_ticker
         return self
+
+    @property
+    def premium_currency_string(self):
+        return f"{self.currency} {self.premium}"
+
+    @property
+    def strike_price_currency_string(self):
+        return f"{self.currency} {self.strike_price}"

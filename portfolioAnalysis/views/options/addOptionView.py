@@ -12,18 +12,19 @@ from typing import Optional
 
 from views.validators import UpperCaseValidator
 from enums.optionType import OptionType
+from enums.currency import Currency
 from models.option import Option
 
 
 class AddOptionView:
     def __init__(self, option: Optional[Option] = None):
-        self.option_type_widget = QComboBox()
 
         self.setup_layout()
 
         if option is not None:
             print("Option is not None")
             self.option_type_widget.setCurrentText(option.option_type.value)
+            self.currency_widget.setCurrentText(option.currency.value)
             self.ticker_widget.setText(option.underlying_ticker)
             self.premium_widget.setText(str(option.premium))
             self.strike_widget.setText(str(option.strike_price))
@@ -36,8 +37,13 @@ class AddOptionView:
             self.execution_widget.setDate(option.execution_date)
 
     def setup_layout(self):
+        self.option_type_widget = QComboBox()
         for value in OptionType.values():
             self.option_type_widget.addItem(value)
+
+        self.currency_widget = QComboBox()
+        for value in Currency.values():
+            self.currency_widget.addItem(value)
 
         self.labels = []
 
@@ -91,6 +97,7 @@ class AddOptionView:
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.option_type_widget)
+        self.layout.addWidget(self.currency_widget)
         self.layout.addWidget(self.ticker_label)
         self.layout.addWidget(self.ticker_widget)
         self.layout.addWidget(self.premium_label)
@@ -123,6 +130,10 @@ class AddOptionView:
     @property
     def option_type(self):
         return self.option_type_widget.currentText()
+
+    @property
+    def currency(self):
+        return self.currency_widget.currentText()
 
     @property
     def ticker(self):
