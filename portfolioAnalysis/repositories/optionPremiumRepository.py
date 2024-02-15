@@ -4,9 +4,9 @@ import pandas as pd
 
 from sqlmodel import Session, select
 
-from db import sql_engine
-from models.option import Option
-from models.optionPremium import OptionPremium
+from portfolioAnalysis.db import sql_engine
+from portfolioAnalysis.models.option import Option
+from portfolioAnalysis.models.optionPremium import OptionPremium
 
 
 class OptionPremiumRepository:

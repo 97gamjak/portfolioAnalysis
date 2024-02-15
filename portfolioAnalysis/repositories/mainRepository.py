@@ -1,6 +1,6 @@
-from repositories.optionRepository import OptionRepository
-from repositories.assetRepository import AssetRepository
-from repositories.optionPremiumRepository import OptionPremiumRepository
+from portfolioAnalysis.repositories.optionRepository import OptionRepository
+from portfolioAnalysis.repositories.assetRepository import AssetRepository
+from portfolioAnalysis.repositories.optionPremiumRepository import OptionPremiumRepository
 
 
 class MainRepository:

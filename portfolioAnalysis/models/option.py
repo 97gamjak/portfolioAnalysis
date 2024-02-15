@@ -5,8 +5,8 @@ import datetime as dt
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
-from enums.optionType import OptionType
-from enums.currency import Currency
+from portfolioAnalysis.enums.optionType import OptionType
+from portfolioAnalysis.enums.currency import Currency
 
 
 class Option(SQLModel, table=True):

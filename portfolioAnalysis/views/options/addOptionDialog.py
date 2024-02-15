@@ -5,8 +5,8 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 
-from views.options.addOptionView import AddOptionView
-from views.options.ambiguousTickerDialog import AmbiguousTickerDialog
+from portfolioAnalysis.views.options.addOptionView import AddOptionView
+from portfolioAnalysis.views.options.ambiguousTickerDialog import AmbiguousTickerDialog
 
 
 class AddOptionDialog(QDialog):

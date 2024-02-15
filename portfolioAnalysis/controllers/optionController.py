@@ -3,10 +3,10 @@ import requests
 
 from PyQt6.QtCore import pyqtSignal, QObject
 
-from models.option import Option
-from enums.optionType import OptionType
-from enums.currency import Currency
-from utils.yfinanceUtils import params_init, get_yf_response_quotes
+from portfolioAnalysis.models.option import Option
+from portfolioAnalysis.enums.optionType import OptionType
+from portfolioAnalysis.enums.currency import Currency
+from portfolioAnalysis.utils.yfinanceUtils import params_init, get_yf_response_quotes
 
 
 class OptionController(QObject):

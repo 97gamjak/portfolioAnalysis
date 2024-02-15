@@ -9,10 +9,10 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QIcon
 
-from views.options.addOptionDialog import AddOptionDialog
-from views.options.infoOptionDialog import InfoOptionDialog
-from views.common.tableViewButtonDelegates import EditDeleteButtonsDelegate
-from proxy.optionsProxy import OpenOptionProxy, ClosedOptionProxy
+from portfolioAnalysis.views.options.addOptionDialog import AddOptionDialog
+from portfolioAnalysis.views.options.infoOptionDialog import InfoOptionDialog
+from portfolioAnalysis.views.common.tableViewButtonDelegates import EditDeleteButtonsDelegate
+from portfolioAnalysis.proxy.optionsProxy import OpenOptionProxy, ClosedOptionProxy
 
 
 class OptionsListView(QDialog):

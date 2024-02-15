@@ -10,10 +10,10 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QDoubleValidator, QIntValidator
 from typing import Optional
 
-from views.validators import UpperCaseValidator
-from enums.optionType import OptionType
-from enums.currency import Currency
-from models.option import Option
+from portfolioAnalysis.views.validators import UpperCaseValidator
+from portfolioAnalysis.enums.optionType import OptionType
+from portfolioAnalysis.enums.currency import Currency
+from portfolioAnalysis.models.option import Option
 
 
 class AddOptionView:

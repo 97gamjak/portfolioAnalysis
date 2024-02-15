@@ -1,9 +1,9 @@
 from PyQt6.QtCore import QAbstractTableModel, Qt
 from sqlmodel import Session, select
 
-from models.asset import Asset
-from db import sql_engine
-from utils.yfinanceUtils import params_init, get_yf_response_quotes
+from portfolioAnalysis.models.asset import Asset
+from portfolioAnalysis.db import sql_engine
+from portfolioAnalysis.utils.yfinanceUtils import params_init, get_yf_response_quotes
 
 
 class AssetRepository(QAbstractTableModel):

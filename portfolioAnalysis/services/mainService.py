@@ -1,4 +1,4 @@
-from services.optionService import OptionService
+from portfolioAnalysis.services.optionService import OptionService
 
 
 class MainService:

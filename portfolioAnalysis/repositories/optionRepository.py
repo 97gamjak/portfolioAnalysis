@@ -2,8 +2,8 @@ from PyQt6.QtCore import QAbstractTableModel, Qt, QModelIndex
 from sqlmodel import Session, select
 from datetime import datetime as dt
 
-from models.option import Option
-from db import sql_engine
+from portfolioAnalysis.models.option import Option
+from portfolioAnalysis.db import sql_engine
 
 
 class OptionRepository(QAbstractTableModel):
