@@ -8,3 +8,5 @@ build/
 _version.py
 
 .vscode/
+
+*.exe
