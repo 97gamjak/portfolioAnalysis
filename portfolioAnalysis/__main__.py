@@ -2,9 +2,9 @@ import sys
 
 from PyQt6.QtWidgets import QApplication
 
-from controllers import MainController
-from repositories import MainRepository
-from views import MainView
+from controllers.mainController import MainController
+from repositories.mainRepository import MainRepository
+from views.mainView import MainView
 
 from db import init_db
 

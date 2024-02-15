@@ -11,3 +11,6 @@ class Currency(Enum):
     @classmethod
     def values(cls):
         return [currency.value for currency in Currency]
+
+    def transform(self, value):
+        return self.value + "{:,.2f}".format(value)

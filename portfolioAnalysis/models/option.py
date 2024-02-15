@@ -50,8 +50,24 @@ class Option(SQLModel, table=True):
 
     @property
     def premium_currency_string(self):
-        return f"{self.currency} {self.premium}"
+        return self.currency.transform(self.premium)
 
     @property
     def strike_price_currency_string(self):
-        return f"{self.currency} {self.strike_price}"
+        return self.currency.transform(self.strike_price)
+
+    @property
+    def theoretical_yield(self):
+        return self.premium / self.strike_price
+
+    @property
+    def theoretical_yearly_yield(self):
+        return self.theoretical_yield * 365 / (self.expiration_date - self.execution_date).days
+
+    @property
+    def theoretical_yield_percentage(self):
+        return f"{self.theoretical_yield * 100:.2f}%"
+
+    @property
+    def theoretical_yearly_yield_percentage(self):
+        return f"{self.theoretical_yearly_yield * 100:.2f}%"

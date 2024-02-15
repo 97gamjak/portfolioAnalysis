@@ -7,6 +7,9 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
 )
 
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
+
 
 class InfoOptionDialog(QDialog):
     def __init__(self, controller, index=None):
@@ -66,13 +69,36 @@ class InfoOptionDialog(QDialog):
 
         layout.addLayout(hbox)
 
+        theoretical_yield = QLabel("Theoretical Yield: ")
+        theoretical_yield_value = QLabel(
+            self.option.theoretical_yield_percentage)
+
+        vbox1 = QVBoxLayout()
+        vbox1.addWidget(theoretical_yield)
+        vbox1.addWidget(theoretical_yield_value)
+
+        theoretical_yearly_yield = QLabel("Theoretical Yearly Yield: ")
+        theoretical_yearly_yield_value = QLabel(
+            self.option.theoretical_yearly_yield_percentage)
+
+        vbox2 = QVBoxLayout()
+        vbox2.addWidget(theoretical_yearly_yield)
+        vbox2.addWidget(theoretical_yearly_yield_value)
+
+        hbox = QHBoxLayout()
+        hbox.addLayout(vbox1)
+        hbox.addLayout(vbox2)
+
+        layout.addLayout(hbox)
+
         layout.addStretch()
 
         premium_evolution = QLabel("Premium Evolution")
-        premium_evolution_table = self.setup_premium_evolution_table()
+        premium_evolution_table, sc = self.setup_premium_evolution_table()
 
         layout.addWidget(premium_evolution)
         layout.addWidget(premium_evolution_table)
+        layout.addWidget(sc)
         self.setLayout(layout)
 
     def get_header(self):
@@ -88,6 +114,19 @@ class InfoOptionDialog(QDialog):
         table_widget.setHorizontalHeaderLabels(header)
         for i, premium in enumerate(self.option_premiums):
             table_widget.setItem(i, 0, QTableWidgetItem(str(premium.date)))
-            table_widget.setItem(i, 1, QTableWidgetItem(str(premium.premium)))
+            table_widget.setItem(i, 1, QTableWidgetItem(
+                self.option.currency.transform(premium.premium)))
 
-        return table_widget
+        sc = MplCanvas(self, width=5, height=4, dpi=100)
+        sc.axes.plot([premium.date for premium in self.option_premiums], [
+            premium.premium for premium in self.option_premiums])
+
+        return table_widget, sc
+
+
+class MplCanvas(FigureCanvasQTAgg):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
