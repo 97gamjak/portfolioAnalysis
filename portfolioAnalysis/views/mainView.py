@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 
 from portfolioAnalysis.views.options.optionListView import OptionsListView
+from portfolioAnalysis.views.options.optionAnalysisView import OptionAnalysisView
 
 
 class MainView(QMainWindow):
@@ -71,7 +72,7 @@ class MainView(QMainWindow):
         minor_action2.setText(0, "Minor Action 2")
 
         minor_action3 = QTreeWidgetItem(option)
-        minor_action3.setText(0, "Minor Action 3")
+        minor_action3.setText(0, "Analysis")
 
         minor_action4 = QTreeWidgetItem(option)
         minor_action4.setText(0, "Minor Action 4")
@@ -86,6 +87,9 @@ class MainView(QMainWindow):
 
         self.options_view = OptionsListView(self)
         self.views["options"] = self.options_view
+
+        self.option_analysis_view = OptionAnalysisView(self)
+        self.views["analysis"] = self.option_analysis_view
 
         for view in self.views.values():
             view.hide()
@@ -105,5 +109,8 @@ class MainView(QMainWindow):
         elif item.text(column) == "Overview":
             self.main_layout.addWidget(self.overview_view)
             self.overview_view.show()
+        elif item.text(column) == "Analysis":
+            self.main_layout.addWidget(self.option_analysis_view)
+            self.option_analysis_view.show()
 
         self.main_layout.setStretch(1, 1)

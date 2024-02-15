@@ -30,6 +30,15 @@ class OptionController(QObject):
     def get_option_premiums_by_option(self, option):
         return self.service.get_option_premiums_by_option(option)
 
+    def get_options(self):
+        return self.service.get_options()
+
+    def get_open_options(self):
+        return self.service.get_open_options()
+
+    def get_closed_options(self):
+        return self.service.get_closed_options()
+
     def add_option(self, option_view):
         try:
             option = self.translate_option_view(option_view)
@@ -85,6 +94,9 @@ class OptionController(QObject):
             ambiguous_tickers = [quote["symbol"] + " " + quote["shortname"]
                                  for quote in response_quotes]
             self.ambiguous_ticker.emit(ambiguous_tickers)
+
+    def update(self):
+        self.service.update()
 
 
 def validate_not_empty(value, message):

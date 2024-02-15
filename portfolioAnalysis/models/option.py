@@ -20,6 +20,7 @@ class Option(SQLModel, table=True):
 
     execution_date: dt.date
     expiration_date: dt.date
+    close_date: Optional[dt.date] = None
 
     underlying_ticker: str = Field(default=None, foreign_key="asset.ticker")
     underlying_price: Optional[float] = None
@@ -71,3 +72,15 @@ class Option(SQLModel, table=True):
     @property
     def theoretical_yearly_yield_percentage(self):
         return f"{self.theoretical_yearly_yield * 100:.2f}%"
+
+    @property
+    def total_days(self):
+        return (self.expiration_date - self.execution_date).days
+
+    @property
+    def days_to_expiration(self):
+        return (self.expiration_date - dt.date.today()).days
+
+    @property
+    def is_open(self):
+        return self.expiration_date >= dt.date.today() if self.close_date is None else False

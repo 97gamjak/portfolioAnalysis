@@ -1,7 +1,7 @@
 from PyQt6.QtCore import QObject
 
-from controllers.optionController import OptionController
-from services.mainService import MainService
+from portfolioAnalysis.controllers.optionController import OptionController
+from portfolioAnalysis.services.mainService import MainService
 
 
 class MainController(QObject):

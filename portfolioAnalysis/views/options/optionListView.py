@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QRect, QModelIndex
+from PyQt6.QtCore import QRect, QModelIndex, Qt
 from PyQt6.QtWidgets import (
     QDialog,
     QWidget,
@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QHeaderView,
     QVBoxLayout,
+    QProgressDialog,
 )
 from PyQt6.QtGui import QIcon
 
@@ -39,8 +40,11 @@ class OptionsListView(QDialog):
 
         self.setLayout(self.layout)
 
-        self.addButton = AddButton(self)
-        self.addButton.clicked.connect(self.show_add_dialog)
+        self.add_button = AddButton(self)
+        self.add_button.clicked.connect(self.show_add_dialog)
+
+        self.update_button = UpdateButton(self)
+        self.update_button.clicked.connect(self.update)
 
     def setup_table_view(self, proxy):
         table_view = QTableView(self)
@@ -66,7 +70,7 @@ class OptionsListView(QDialog):
         return table_view
 
     def resizeEvent(self, event):
-        self.addButton.resizeEvent(event)
+        self.add_button.resizeEvent(event)
 
     def show_add_dialog(self):
         dlg = AddOptionDialog(self.controller)
@@ -86,6 +90,11 @@ class OptionsListView(QDialog):
         dlg = InfoOptionDialog(self.controller, index.row())
         dlg.exec()
 
+    def update(self):
+        dlg = UpdateDialog(
+            self.controller, self.parent.repository.option_premium_repository)
+        dlg.exec()
+
 
 class AddButton(QPushButton):
 
@@ -95,6 +104,49 @@ class AddButton(QPushButton):
         self.setStyleSheet(
             "background-color: green; border: 1px solid #d3d3d3; border-radius: 5px;")
         self.delta_x = 100
+        self.delta_y = 60
+        x = parent.width() - self.delta_x
+        y = parent.height() - self.delta_y
+        super().setGeometry(QRect(x, y, 40, 24))
+
+        self.parent = parent
+
+    def resizeEvent(self, event):
+        new_x = self.parent.width() - self.delta_x
+        new_y = self.parent.height() - self.delta_y
+        super().move(new_x, new_y)
+
+
+class UpdateDialog(QProgressDialog):
+    def __init__(self, controller, repository):
+        super().__init__("Updating option premiums...", "Cancel", 0, 0)
+        self.setWindowModality(Qt.WindowModality.WindowModal)
+        self.controller = controller
+        self.repository = repository
+        self.setGeometry(QRect(0, 0, 800, 100))
+        self.setAutoClose(True)
+
+    def exec(self):
+        self.show()
+        self.repository.maximum_progress.connect(self.set_maximum)
+        self.repository.progress.connect(self.set_value)
+
+        self.controller.update()
+
+    def set_maximum(self, value):
+        self.setMaximum(value)
+
+    def set_value(self, value):
+        self.setValue(value)
+
+
+class UpdateButton(QPushButton):
+    def __init__(self, parent):
+        super().__init__(parent=parent)
+        self.setIcon(QIcon.fromTheme("view-refresh"))
+        self.setStyleSheet(
+            "background-color: blue; border: 1px solid #d3d3d3; border-radius: 5px;")
+        self.delta_x = 160
         self.delta_y = 60
         x = parent.width() - self.delta_x
         y = parent.height() - self.delta_y

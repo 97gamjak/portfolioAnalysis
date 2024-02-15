@@ -56,6 +56,14 @@ class OptionRepository(QAbstractTableModel):
             except Exception:
                 return []
 
+    def get_open_options(self):
+        self.options = self.get_options()
+        return [option for option in self.options if option.is_open]
+
+    def get_closed_options(self):
+        self.options = self.get_options()
+        return [option for option in self.options if not option.is_open]
+
     def get_table_data(self):
         table = []
         for option in self.options:

@@ -1,27 +1,31 @@
 import datetime as dt
 import yfinance as yf
 import pandas as pd
+import time
 
 from sqlmodel import Session, select
+from PyQt6.QtCore import pyqtSignal, QObject
 
 from portfolioAnalysis.db import sql_engine
 from portfolioAnalysis.models.option import Option
 from portfolioAnalysis.models.optionPremium import OptionPremium
 
 
-class OptionPremiumRepository:
-    def __init__(self):
-        self.update()
+class OptionPremiumRepository(QObject):
+    maximum_progress = pyqtSignal(int)
+    progress = pyqtSignal(int)
 
     def update(self):
         with Session(sql_engine) as session:
             statement = select(Option).where(
                 Option.expiration_date >= dt.date.today())
             options = session.exec(statement).all()
-            for option in options:
+            self.maximum_progress.emit(len(options))
+            for i, option in enumerate(options):
                 option_premium = get_option_premium_from_yf(option)
 
                 if option_premium is None:
+                    self.progress.emit(i)
                     continue
 
                 statement = select(OptionPremium).where(
@@ -32,6 +36,7 @@ class OptionPremiumRepository:
                 exists = session.exec(statement).first() is not None
                 if not exists:
                     session.add(option_premium)
+                self.progress.emit(i)
 
             session.commit()
 
@@ -55,7 +60,8 @@ def get_option_premium_from_yf(option):
         option_chain_index = 0
     else:
         option_chain_index = 1
-    option_chain = ticker.option_chain()[option_chain_index]
+    option_chain = ticker.option_chain(str(option.expiration_date))[
+        option_chain_index]
 
     data = option_chain[option_chain["contractSymbol"] == option.ticker]
 
