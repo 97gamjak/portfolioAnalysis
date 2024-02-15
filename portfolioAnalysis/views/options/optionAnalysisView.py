@@ -4,7 +4,10 @@ from PyQt6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
+    QHeaderView,
 )
+
+from portfolioAnalysis.utils.stringUtils import double_to_percentage
 
 
 class OptionAnalysisView(QDialog):
@@ -55,15 +58,42 @@ class OpenOptionTableView(QTableWidget):
 
         self.open_options = self.controller.get_open_options()
 
-        header = ["Option Type", "Underlying Ticker"]
+        header = [
+            "Option\nType",
+            "Underlying\nTicker",
+            "Total\nDays",
+            "Days\nLeft",
+            "Past\nTime",
+            "Avg.\nStrike",
+            "Total\nPremium",
+            "Yield",
+            "Yearly\nYield",
+        ]
 
         self.setColumnCount(len(header))
         self.setHorizontalHeaderLabels(header)
         self.setRowCount(len(self.open_options))
+        self.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.ResizeToContents)
 
         for i, option in enumerate(self.open_options):
+            currency = option.currency
+
             self.setItem(i, 0, QTableWidgetItem(str(option.option_type)))
             self.setItem(i, 1, QTableWidgetItem(option.underlying_ticker))
+            self.setItem(i, 2, QTableWidgetItem(str(option.total_days)))
+            self.setItem(i, 3, QTableWidgetItem(
+                str(option.days_to_expiration)))
+            self.setItem(i, 4, QTableWidgetItem(
+                double_to_percentage(option.past_time)))
+            self.setItem(i, 5, QTableWidgetItem(
+                currency.transform(option.avg_strike)))
+            self.setItem(i, 6, QTableWidgetItem(
+                currency.transform(option.total_premium)))
+            self.setItem(i, 7, QTableWidgetItem(
+                double_to_percentage(option.theoretical_yield)))
+            self.setItem(i, 8, QTableWidgetItem(
+                double_to_percentage(option.theoretical_yearly_yield)))
 
 
 class ClosedOptionTableView(QTableWidget):
@@ -77,12 +107,38 @@ class ClosedOptionTableView(QTableWidget):
 
         self.closed_options = self.controller.get_closed_options()
 
-        header = ["Option Type", "Underlying Ticker"]
+        header = [
+            "Option\nType",
+            "Underlying\nTicker",
+            "Total\nDays",
+            "Actual\nDays",
+            "Avg.\nStrike",
+            "Total\nPremium",
+            "Yield",
+            "Yearly\nYield",
+            "effective\nYield",
+            "effective\nYearly\nYield",
+        ]
 
         self.setColumnCount(len(header))
         self.setHorizontalHeaderLabels(header)
         self.setRowCount(len(self.closed_options))
+        self.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.ResizeToContents)
 
         for i, option in enumerate(self.closed_options):
+            currency = option.currency
+
             self.setItem(i, 0, QTableWidgetItem(str(option.option_type)))
             self.setItem(i, 1, QTableWidgetItem(option.underlying_ticker))
+            self.setItem(i, 2, QTableWidgetItem(str(option.total_days)))
+            self.setItem(i, 3, QTableWidgetItem(
+                str(option.actual_days)))
+            self.setItem(i, 5, QTableWidgetItem(
+                currency.transform(option.avg_strike)))
+            self.setItem(i, 6, QTableWidgetItem(
+                currency.transform(option.total_premium)))
+            self.setItem(i, 7, QTableWidgetItem(
+                double_to_percentage(option.theoretical_yield)))
+            self.setItem(i, 8, QTableWidgetItem(
+                double_to_percentage(option.theoretical_yearly_yield)))

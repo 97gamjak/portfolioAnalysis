@@ -15,12 +15,16 @@ class Option(SQLModel, table=True):
     strike_price: float
     premium: float
     currency: Currency
+    commission: Optional[float] = 0.0
 
     shares: int = 1
 
     execution_date: dt.date
     expiration_date: dt.date
+
     close_date: Optional[dt.date] = None
+    closing_premium: Optional[float] = 0.0
+    closing_commission: Optional[float] = 0.0
 
     underlying_ticker: str = Field(default=None, foreign_key="asset.ticker")
     underlying_price: Optional[float] = None
@@ -58,20 +62,28 @@ class Option(SQLModel, table=True):
         return self.currency.transform(self.strike_price)
 
     @property
+    def avg_strike(self):
+        return self.strike_price
+
+    @property
+    def total_premium(self):
+        return self.premium - self.commission - self.closing_commission - self.closing_premium
+
+    @property
     def theoretical_yield(self):
         return self.premium / self.strike_price
+
+    @property
+    def effective_yield(self):
+        return self.total_premium / self.strike_price
 
     @property
     def theoretical_yearly_yield(self):
         return self.theoretical_yield * 365 / (self.expiration_date - self.execution_date).days
 
     @property
-    def theoretical_yield_percentage(self):
-        return f"{self.theoretical_yield * 100:.2f}%"
-
-    @property
-    def theoretical_yearly_yield_percentage(self):
-        return f"{self.theoretical_yearly_yield * 100:.2f}%"
+    def effective_yearly_yield(self):
+        return self.effective_yield * 365 / (self.expiration_date - self.execution_date).days
 
     @property
     def total_days(self):
@@ -80,6 +92,14 @@ class Option(SQLModel, table=True):
     @property
     def days_to_expiration(self):
         return (self.expiration_date - dt.date.today()).days
+
+    @property
+    def actual_days(self):
+        return (self.close_date - self.execution_date).days if self.close_date is not None else self.total_days
+
+    @property
+    def past_time(self):
+        return (dt.date.today() - self.execution_date).days / self.total_days
 
     @property
     def is_open(self):
