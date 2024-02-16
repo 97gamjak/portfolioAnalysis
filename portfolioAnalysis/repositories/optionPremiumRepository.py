@@ -46,12 +46,31 @@ class OptionPremiumRepository(QObject):
                 option_id=option.id, premium=option.premium, date=option.execution_date)
             session.add(option_premium)
             session.commit()
+            session.refresh(option_premium)
+
+    def change_initial_option_premium_by_option(self, option):
+        with Session(sql_engine) as session:
+            statement = select(OptionPremium).where(
+                OptionPremium.option_id == option.id)
+            option_premium = session.exec(statement).first()
+            option_premium.premium = option.premium
+            option_premium.date = option.execution_date
+            session.commit()
 
     def get_option_premiums_by_option(self, option):
         with Session(sql_engine) as session:
             statement = select(OptionPremium).where(
                 OptionPremium.option_id == option.id)
             return session.exec(statement).all()
+
+    def delete_option_premium_by_id(self, option_id):
+        with Session(sql_engine) as session:
+            statement = select(OptionPremium).where(
+                OptionPremium.option_id == option_id)
+            premiums = session.exec(statement).all()
+            for premium in premiums:
+                session.delete(premium)
+            session.commit()
 
 
 def get_option_premium_from_yf(option):

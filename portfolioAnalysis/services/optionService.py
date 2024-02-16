@@ -8,7 +8,9 @@ class OptionService:
         self.option_premium_repository = repository.option_premium_repository
 
     def delete_option(self, index):
+        option_id = self.get_option(index).id
         self.option_repository.delete_option_by_index(index)
+        self.option_premium_repository.delete_option_premium_by_id(option_id)
 
     def get_option(self, index):
         return self.option_repository.get_option_by_index(index)
@@ -36,6 +38,9 @@ class OptionService:
 
         self.asset_repository.create_asset_if_not_found(asset)
         self.option_repository.edit_option(option, index)
+        option = self.get_option(index)
+        self.option_premium_repository.change_initial_option_premium_by_option(
+            option)
 
     def get_underlying_by_option(self, option):
         return self.asset_repository.find_asset_by_ticker(

@@ -67,10 +67,11 @@ class OptionRepository(QAbstractTableModel):
     def get_table_data(self):
         table = []
         for option in self.options:
+            currency = option.currency
             table.append(
                 [option.ticker,
-                 option.premium_currency_string,
-                 option.strike_price_currency_string,
+                 currency.transform(option.premium),
+                 currency.transform(option.strike_price),
                  str(option.execution_date),
                  str(option.expiration_date),
                  option.shares,

@@ -54,14 +54,6 @@ class Option(SQLModel, table=True):
         return self
 
     @property
-    def premium_currency_string(self):
-        return self.currency.transform(self.premium)
-
-    @property
-    def strike_price_currency_string(self):
-        return self.currency.transform(self.strike_price)
-
-    @property
     def avg_strike(self):
         return self.strike_price
 

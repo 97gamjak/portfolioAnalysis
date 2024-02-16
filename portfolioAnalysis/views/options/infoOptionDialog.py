@@ -10,6 +10,8 @@ from PyQt6.QtWidgets import (
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 
+from utils.stringUtils import double_to_percentage
+
 
 class InfoOptionDialog(QDialog):
     def __init__(self, controller, index=None):
@@ -21,6 +23,7 @@ class InfoOptionDialog(QDialog):
 
         self.option = self.controller.get_option(index)
         self.underlying = self.controller.get_underlying_by_option(self.option)
+        currency = self.option.currency
 
         layout = QVBoxLayout()
 
@@ -30,14 +33,15 @@ class InfoOptionDialog(QDialog):
         layout.addWidget(header)
 
         initial_premium = QLabel("Initial Premium: ")
-        initial_premium_value = QLabel(self.option.premium_currency_string)
+        initial_premium_value = QLabel(currency.transform(self.option.premium))
 
         vbox1 = QVBoxLayout()
         vbox1.addWidget(initial_premium)
         vbox1.addWidget(initial_premium_value)
 
         strike_price = QLabel("Strike Price: ")
-        strike_price_value = QLabel(self.option.strike_price_currency_string)
+        strike_price_value = QLabel(
+            currency.transform(self.option.strike_price))
 
         vbox2 = QVBoxLayout()
         vbox2.addWidget(strike_price)
@@ -71,7 +75,7 @@ class InfoOptionDialog(QDialog):
 
         theoretical_yield = QLabel("Theoretical Yield: ")
         theoretical_yield_value = QLabel(
-            self.option.theoretical_yield_percentage)
+            double_to_percentage(self.option.theoretical_yield))
 
         vbox1 = QVBoxLayout()
         vbox1.addWidget(theoretical_yield)
@@ -79,7 +83,7 @@ class InfoOptionDialog(QDialog):
 
         theoretical_yearly_yield = QLabel("Theoretical Yearly Yield: ")
         theoretical_yearly_yield_value = QLabel(
-            self.option.theoretical_yearly_yield_percentage)
+            double_to_percentage(self.option.theoretical_yearly_yield))
 
         vbox2 = QVBoxLayout()
         vbox2.addWidget(theoretical_yearly_yield)
