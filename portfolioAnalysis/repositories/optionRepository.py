@@ -103,6 +103,20 @@ class OptionRepository(QAbstractTableModel):
             self.dataChanged.emit(self.index(index, 0), self.index(
                 index, self.columnCount(self.parent)))
 
+    def close_option(self, option, close_option):
+        with Session(sql_engine) as session:
+            option_to_close = self.find_option_by_option(option)
+            option_to_close.close(close_option)
+            session.add(option_to_close)
+            session.commit()
+            session.refresh(option_to_close)
+            self.refresh()
+
+    def find_option_by_option(self, option):
+        with Session(sql_engine) as session:
+            statement = select(Option).where(Option.id == option.id)
+            return session.exec(statement).first()
+
     def find_option_by_index(self, index):
         with Session(sql_engine) as session:
             option = self.options[index]

@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import datetime as dt
 
-from typing import Optional
-from sqlmodel import SQLModel, Field
+from typing import Optional, List, TYPE_CHECKING
+from sqlmodel import SQLModel, Field, Relationship
 
 from portfolioAnalysis.enums.optionType import OptionType
 from portfolioAnalysis.enums.currency import Currency
+
+if TYPE_CHECKING:
+    from portfolioAnalysis.models.optionPremium import OptionPremium
 
 
 class Option(SQLModel, table=True):
@@ -26,9 +29,14 @@ class Option(SQLModel, table=True):
     closing_premium: Optional[float] = 0.0
     closing_commission: Optional[float] = 0.0
 
-    underlying_ticker: str = Field(default=None, foreign_key="asset.ticker")
     underlying_price: Optional[float] = None
     underlying_shares: int = 100
+    underlying_ticker: str = Field(default=None, foreign_key="asset.ticker")
+    # underlying: Optional["Asset"] = Relationship(
+    #     back_populates="asset.options")
+
+    live_premiums: List["OptionPremium"] = Relationship(
+        back_populates="option")
 
     @property
     def ticker(self):
@@ -46,20 +54,34 @@ class Option(SQLModel, table=True):
 
     def edit(self, option: Option):
         self.option_type = option.option_type
-        self.strike_price = option.strike_price
-        self.expiration_date = option.expiration_date
+        self.currency = option.currency
         self.premium = option.premium
+        self.strike_price = option.strike_price
+        self.commission = option.commission
+        self.execution_date = option.execution_date
+        self.expiration_date = option.expiration_date
+        self.shares = option.shares
+        self.underlying_shares = option.underlying_shares
         self.underlying_price = option.underlying_price
         self.underlying_ticker = option.underlying_ticker
         return self
+
+    def close(self, close_option):
+        self.close_date = close_option.close_date
+        self.closing_premium = close_option.premium
+        self.closing_commission = close_option.commission
 
     @property
     def avg_strike(self):
         return self.strike_price
 
     @property
+    def total_commission(self):
+        return self.commission + self.closing_commission
+
+    @property
     def total_premium(self):
-        return self.premium - self.commission - self.closing_commission - self.closing_premium
+        return self.premium - self.total_commission - self.closing_premium
 
     @property
     def theoretical_yield(self):

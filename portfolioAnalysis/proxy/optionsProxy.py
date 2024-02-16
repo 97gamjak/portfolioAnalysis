@@ -6,16 +6,12 @@ from PyQt6.QtCore import QSortFilterProxyModel
 class OpenOptionProxy(QSortFilterProxyModel):
     def __init__(self, parent, model):
         super().__init__(parent)
-        self.parent = parent
         self.setSourceModel(model)
-        self.setFilterKeyColumn(model.expiration_date_column)
         model.dataChanged.connect(self.invalidateFilter)
 
     def filterAcceptsRow(self, source_row, source_parent):
-        idx = self.sourceModel().index(
-            source_row, self.filterKeyColumn(), source_parent)
-        data = self.sourceModel().data(idx, self.filterRole())
-        return dt.date.fromisoformat(data) >= dt.date.today()
+        option = self.sourceModel().options[source_row]
+        return option.is_open
 
 
 class ClosedOptionProxy(OpenOptionProxy):

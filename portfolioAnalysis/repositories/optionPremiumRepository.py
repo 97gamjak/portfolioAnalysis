@@ -55,7 +55,9 @@ class OptionPremiumRepository(QObject):
             option_premium = session.exec(statement).first()
             option_premium.premium = option.premium
             option_premium.date = option.execution_date
+            session.add(option_premium)
             session.commit()
+            session.refresh(option_premium)
 
     def get_option_premiums_by_option(self, option):
         with Session(sql_engine) as session:

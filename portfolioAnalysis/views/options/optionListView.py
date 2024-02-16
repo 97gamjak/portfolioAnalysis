@@ -13,6 +13,7 @@ from PyQt6.QtGui import QIcon
 from portfolioAnalysis.views.options.addOptionDialog import AddOptionDialog
 from portfolioAnalysis.views.options.infoOptionDialog import InfoOptionDialog
 from portfolioAnalysis.views.common.tableViewButtonDelegates import EditDeleteButtonsDelegate
+from portfolioAnalysis.views.options.closeOptionDialog import CloseOptionDialog
 from portfolioAnalysis.proxy.optionsProxy import OpenOptionProxy, ClosedOptionProxy
 
 
@@ -66,6 +67,8 @@ class OptionsListView(QDialog):
             lambda x: self.edit_option(x, proxy))
         delegate.info_button_clicked.connect(
             lambda x: self.info_option(x, proxy))
+        delegate.close_button_clicked.connect(
+            lambda x: self.close_option(x, proxy))
 
         return table_view
 
@@ -88,6 +91,11 @@ class OptionsListView(QDialog):
     def info_option(self, index, proxy):
         index = proxy.mapToSource(QModelIndex(index))
         dlg = InfoOptionDialog(self.controller, index.row())
+        dlg.exec()
+
+    def close_option(self, index, proxy):
+        index = proxy.mapToSource(QModelIndex(index))
+        dlg = CloseOptionDialog(self.controller, index.row())
         dlg.exec()
 
     def update(self):

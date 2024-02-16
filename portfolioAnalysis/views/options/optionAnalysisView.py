@@ -139,6 +139,12 @@ class ClosedOptionTableView(QTableWidget):
             self.setItem(i, 6, QTableWidgetItem(
                 currency.transform(option.total_premium)))
             self.setItem(i, 7, QTableWidgetItem(
+                currency.transform(option.total_commission)))
+            self.setItem(i, 7, QTableWidgetItem(
                 double_to_percentage(option.theoretical_yield)))
             self.setItem(i, 8, QTableWidgetItem(
                 double_to_percentage(option.theoretical_yearly_yield)))
+            self.setItem(i, 9, QTableWidgetItem(
+                double_to_percentage(option.effective_yield)))
+            self.setItem(i, 10, QTableWidgetItem(
+                double_to_percentage(option.effective_yearly_yield)))

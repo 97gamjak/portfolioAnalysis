@@ -22,12 +22,12 @@ class AddOptionView:
         self.setup_layout()
 
         if option is not None:
-            print("Option is not None")
             self.option_type_widget.setCurrentText(option.option_type.value)
             self.currency_widget.setCurrentText(option.currency.value)
             self.ticker_widget.setText(option.underlying_ticker)
             self.premium_widget.setText(str(option.premium))
             self.strike_widget.setText(str(option.strike_price))
+            self.commission_widget.setText(str(option.commission))
             self.shares_widget.setText(str(option.shares))
             self.underlying_shares_widget.setText(
                 str(option.underlying_shares))
@@ -61,6 +61,11 @@ class AddOptionView:
         self.labels.append(self.strike_label)
         self.strike_widget = self.init_line_edit(
             "Strike Price", QDoubleValidator())
+
+        self.commission_label = QLabel("Commission:")
+        self.labels.append(self.commission_label)
+        self.commission_widget = self.init_line_edit(
+            "Commission", QDoubleValidator(), "0")
 
         self.shares_label = QLabel("Number of Shares:")
         self.labels.append(self.shares_label)
@@ -104,6 +109,8 @@ class AddOptionView:
         self.layout.addWidget(self.premium_widget)
         self.layout.addWidget(self.strike_label)
         self.layout.addWidget(self.strike_widget)
+        self.layout.addWidget(self.commission_label)
+        self.layout.addWidget(self.commission_widget)
         self.layout.addWidget(self.shares_label)
         self.layout.addWidget(self.shares_widget)
         self.layout.addWidget(self.underlying_shares_label)
@@ -146,6 +153,10 @@ class AddOptionView:
     @property
     def strike(self):
         return self.strike_widget.text()
+
+    @property
+    def commission(self):
+        return self.commission_widget.text()
 
     @property
     def underlying_price(self):

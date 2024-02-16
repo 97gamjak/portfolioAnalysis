@@ -2,11 +2,15 @@ import yfinance as yf
 import requests
 
 from PyQt6.QtCore import pyqtSignal, QObject
+from sqlmodel import Session
 
 from portfolioAnalysis.models.option import Option
+from portfolioAnalysis.models.closeOption import CloseOption
 from portfolioAnalysis.enums.optionType import OptionType
 from portfolioAnalysis.enums.currency import Currency
 from portfolioAnalysis.utils.yfinanceUtils import params_init, get_yf_response_quotes
+
+from portfolioAnalysis.db import sql_engine
 
 
 class OptionController(QObject):
@@ -41,7 +45,9 @@ class OptionController(QObject):
 
     def add_option(self, option_view):
         try:
+            print("test")
             option = self.translate_option_view(option_view)
+            print("test")
 
             self.service.add_option(option)
             self.add_option_successful.emit(True, "OK")
@@ -57,26 +63,47 @@ class OptionController(QObject):
         except Exception as e:
             self.add_option_successful.emit(False, str(e))
 
+    def close_option(self, option_view, index):
+        try:
+            close_option = self.translate_close_option_view(option_view)
+            option = self.get_option(index)
+            self.service.close_option(option, close_option)
+        except Exception as e:
+            raise e
+
     def translate_option_view(self, option_view):
         validate_not_empty(option_view.strike, "Strike")
         validate_not_empty(option_view.premium, "Premium")
 
-        option = Option(
-            option_type=OptionType(option_view.option_type),
-            currency=Currency(option_view.currency),
-            underlying_ticker=option_view.ticker,
-            strike_price=float(option_view.strike),
-            expiration_date=option_view.expiration_date.toPyDate(),
-            execution_date=option_view.execution_date.toPyDate(),
-            premium=float(option_view.premium),
-            shares=int(option_view.shares) if option_view.shares else 1,
-            underlying_price=float(
-                option_view.underlying_price) if option_view.underlying_price else None,
-            underlying_shares=int(
-                option_view.underlying_shares) if option_view.underlying_shares else 100
-        )
+        with Session(sql_engine) as session:
+            option = Option(
+                option_type=OptionType(option_view.option_type),
+                currency=Currency(option_view.currency),
+                underlying_ticker=option_view.ticker,
+                strike_price=float(option_view.strike),
+                commission=float(option_view.commission),
+                expiration_date=option_view.expiration_date.toPyDate(),
+                execution_date=option_view.execution_date.toPyDate(),
+                premium=float(option_view.premium),
+                shares=int(option_view.shares) if option_view.shares else 1,
+                underlying_price=float(
+                    option_view.underlying_price) if option_view.underlying_price else None,
+                underlying_shares=int(
+                    option_view.underlying_shares) if option_view.underlying_shares else 100
+            )
 
         return option
+
+    def translate_close_option_view(self, option_view):
+        validate_not_empty(option_view.premium, "Premium")
+
+        close_option = CloseOption(
+            premium=float(option_view.premium),
+            commission=float(option_view.commission),
+            close_date=option_view.close_date.toPyDate(),
+        )
+
+        return close_option
 
     def validate_ticker(self, ticker):
         if not ticker:

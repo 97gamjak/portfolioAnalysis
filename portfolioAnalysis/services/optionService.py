@@ -24,6 +24,9 @@ class OptionService:
     def get_closed_options(self):
         return self.option_repository.get_closed_options()
 
+    def close_option(self, option, close_option):
+        self.option_repository.close_option(option, close_option)
+
     def add_option(self, option):
 
         asset = Asset(ticker=option.underlying_ticker)
@@ -41,13 +44,6 @@ class OptionService:
         option = self.get_option(index)
         self.option_premium_repository.change_initial_option_premium_by_option(
             option)
-
-    def get_underlying_by_option(self, option):
-        return self.asset_repository.find_asset_by_ticker(
-            option.underlying_ticker)
-
-    def get_option_premiums_by_option(self, option):
-        return self.option_premium_repository.get_option_premiums_by_option(option)
 
     def update(self):
         self.option_premium_repository.update()
